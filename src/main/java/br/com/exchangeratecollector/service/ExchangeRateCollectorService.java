@@ -18,17 +18,18 @@ public class ExchangeRateCollectorService {
 
     @Inject
     @Channel("exchange-rates")
-    Emitter<ExchangeRateRecord> emitter;  // Modificado para ExchangeRateRecord
+    Emitter<ExchangeRateRecord> emitter;
 
+    /**
+     * Esse método é responsável por realizar a busca e manipulação dos dados coletados da API de moedas
+     * Primeiramente a API é consultada por meio da classe {@link ExchangeRateCollectorClient}
+     * Seu retorno então é dividido entre dois objetos e emitido para o microserviço de persistência
+     */
     public void collectRates() {
         MoedasRecord response = exchangeRateCollectorClient.getRates("USD-BRL,BTC-BRL");
 
         emitter.send(response.USDBRL());
         emitter.send(response.BTCBRL());
-
-        System.out.println(response);
-        System.out.println(response.USDBRL());
-        System.out.println(response.BTCBRL());
     }
 
 }
