@@ -1,11 +1,12 @@
 package br.com.exchangeratecollector.service;
 
 import br.com.exchangeratecollector.api.ExchangeRateCollectorClient;
-import br.com.exchangeratecollector.api.ExchangeRatePersistanceClient;
+import br.com.exchangeratecollector.service.dto.ExchangeRateRecord;
 import br.com.exchangeratecollector.service.dto.MoedasRecord;
-import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @ApplicationScoped
@@ -16,14 +17,14 @@ public class ExchangeRateCollectorService {
     ExchangeRateCollectorClient exchangeRateCollectorClient;
 
     @Inject
-    @RestClient
-    ExchangeRatePersistanceClient exchangeRatePersistanceClient;
-
+    @Channel("exchange-rates")
+    Emitter<ExchangeRateRecord> emitter;  // Modificado para ExchangeRateRecord
 
     public void collectRates() {
         MoedasRecord response = exchangeRateCollectorClient.getRates("USD-BRL,BTC-BRL");
-        exchangeRatePersistanceClient.sendExchangeRate(response.USDBRL());
-        exchangeRatePersistanceClient.sendExchangeRate(response.BTCBRL());
+
+        emitter.send(response.USDBRL());
+        emitter.send(response.BTCBRL());
 
         System.out.println(response);
         System.out.println(response.USDBRL());

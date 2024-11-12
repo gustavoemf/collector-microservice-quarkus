@@ -1,4 +1,6 @@
 package br.com.exchangeratecollector.service.dto;
 
-public record ExchangeRateRecord(String name, double bid, double ask, String timestamp) {
+import java.time.LocalDateTime;
+
+public record ExchangeRateRecord(String name, double bid, double ask, LocalDateTime timestamp) {
 }
